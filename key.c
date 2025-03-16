@@ -21,6 +21,7 @@ int main() {
     }
     return 0;
 }
+
 //key
 #include <pthread.h>
 #include <stdio.h>
