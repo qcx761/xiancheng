@@ -11,6 +11,8 @@ pthread_cond_t cond = PTHREAD_COND_INITIALIZER;   // 一次性初始化条件变
 
 
 
+
+
 sigemptyset(&set);
 sigaddset(&set, SIGINT);
 pthread_sigmask(SIG_BLOCK, &set, NULL);
