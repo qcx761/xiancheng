@@ -2,10 +2,10 @@
 #define THREADPOOL_HPP
 #include <bits/stdc++.h>
 using namespace std;
-class ThreadPool {
+class threadpool {
     public:
-        ThreadPool(size_t numThreads);//threadpool create
-        ~ThreadPool(); // 释放
+        threadpool(size_t numThreads);//threadpool create
+        ~threadpool(); // 释放
     
         template<typename F>
         auto enqueue(F&& f) -> future<typename result_of<F()>::type>; // 将任务添加到线程池的任务队列中
@@ -24,3 +24,14 @@ class ThreadPool {
 //quenen
 //ector
 //function
+
+
+
+        //lambda 表达式
+        // [capture](parameters) -> return_type {
+        //     // function body
+        // }
+        // capture：指定如何捕获外部变量，可以为空或包含变量。
+        // parameters：参数列表，类似于函数的参数。
+        // -> return_type：可选，指定返回类型（通常可以省略，编译器会进行推导）。
+        // {}：函数体。
