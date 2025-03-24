@@ -1,7 +1,7 @@
 #include"threadpool.hpp"
 using namespace std;
-threadpool::threadpool(size_t numThreads):stop(false){
-    
+threadpool::threadpool(size_t numThreads):done(false){
+
 }
 int main(){
     

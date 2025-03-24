@@ -12,10 +12,10 @@ class threadpool {
     
     private:
         vector<thread> workers; // 线程池中的线程
-        queue<function<void()>> tasks; // 任务队列
+        queue<function<void()>> taskqueue; // 任务队列
         mutex mtx; // 互斥量
         condition_variable condition; // 条件变量
-        bool stop; // 停止标志
+        bool done; // 停止标志
     };
 
 #endif
