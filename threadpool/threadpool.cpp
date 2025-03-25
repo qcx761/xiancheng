@@ -32,7 +32,12 @@ threadpool::~threadpool(){
 
 template<typename F,class... Args>
 auto enqueue(F&& f,Args&&... args) -> future<invoke_result_t<F,Args...>>{
+    using return_type=invoke_result_t<F,Args...>;
+     // 绑定函数和参数，创建packaged_task
+    auto task=make_shared<packaged_task<return_type()>>(bind(forward<F>(f),forward<Args>(args)...);
+    future<return_type> res=task->get_future();
     
+    );
 }
 
 
