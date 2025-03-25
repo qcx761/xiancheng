@@ -7,8 +7,8 @@ class threadpool {
         threadpool(size_t num);//线程池创建
         ~threadpool(); // 释放
     
-        template<typename F> // 声明范型函数
-        auto enqueue(F&& f) -> future<invoke_result_t<F>>; // 创建任务队列
+        template<typename F,class... Args> // 可变参数的 enqueue 版本
+        auto enqueue(F&& f,Args&&... args) -> future<invoke_result_t<F,Args...>>; // 创建任务队列
     
     private:
         vector<thread> workers; // 线程池中的线程

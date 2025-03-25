@@ -3,7 +3,6 @@ using namespace std;
 threadpool::threadpool(size_t num):stop(false){
     for(int i=1;i<num;i++){
         this->workers.emplace_back([this]{
-            
             while(1){
                 function<void()> task;
                 {
@@ -29,9 +28,41 @@ threadpool::~threadpool(){
     for(int j=0;j<this->workers.size();j++){
         workers[j].join();
     }
-
 }
 
+template<typename F,class... Args>
+auto enqueue(F&& f,Args&&... args) -> future<invoke_result_t<F,Args...>>{
+    
+}
+
+
+// template<typename F>
+// auto ThreadPool::enqueue(F&& f) -> std::future<std::invoke_result_t<F>>
+// {
+//     using return_type = std::invoke_result_t<F>;
+
+//     // 1. 创建 packaged_task（已绑定可调用对象）
+//     auto task = std::make_shared<std::packaged_task<return_type()>>(
+//         std::forward<F>(f)
+//     );
+
+//     // 2. 获取 future
+//     std::future<return_type> res = task->get_future();
+
+//     // 3. 临界区（加锁入队）
+//     {
+//         std::unique_lock<std::mutex> lock(queue_mutex);
+//         if(stop) {
+//             throw std::runtime_error("enqueue on stopped ThreadPool");
+//         }
+//         tasks.emplace([task] { (*task)(); }); // 包装为 void() 类型
+//     }
+
+//     // 4. 唤醒一个工作线程
+//     condition.notify_one();
+
+//     return res;
+// }
 
 
 // public:
