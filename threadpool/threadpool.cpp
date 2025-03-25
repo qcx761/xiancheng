@@ -1,7 +1,7 @@
 #include"threadpool.hpp"
 using namespace std;
 threadpool::threadpool(size_t num):stop(false){
-    for(int i=1;i<num;i++){
+    for(int i=0;i<num;i++){
         this->workers.emplace_back([this]{
             while(1){
                 function<void()> task;
