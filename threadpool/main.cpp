@@ -1,8 +1,21 @@
 #include "threadpool.hpp"
 using namespace std;
 int main(){
-    threadpool pool(4); //调用构造函数创建4个线程
-    vector<future<int>> results;
+    threadpool pool(4);
+    std::vector<std::future<int>> results;
+    
+    for (int i = 0; i < 8; ++i) {
+        results.emplace_back(pool.enqueue([i] {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            return i * i;
+        }));
+    }
+    
+    for (auto& result : results) {
+        std::cout << result.get() << ' ';
+    }
+    
+    return 0;
 }
 
 

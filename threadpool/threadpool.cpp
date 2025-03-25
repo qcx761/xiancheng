@@ -1,14 +1,36 @@
 #include"threadpool.hpp"
 using namespace std;
-threadpool::threadpool(size_t numThreads):done(false){
+threadpool::threadpool(size_t num):stop(false){
+    for(int i=1;i<num;i++){
+        this->workers.emplace_back([this]{
+            
+            while(1){
+                function<void()> task;
+                {
+                unique_lock<mutex> lock(this->mtx);
+                bool isempty=this->tasks.empty();
+                this->condition.wait(lock,!isempty||this->stop);
+                if(stop&&isempty) return;
+                task=this->tasks.front();
+                this->tasks.pop();
+                }
+                task();
+            }
+        });
+    }
+}
+
+threadpool::~threadpool(){
+    {
+        unique_lock<mutex> lock(this->mtx);
+        this->stop=true;
+    }
+    this->condition.notify_all();
+    for(int j=0;j<this->workers.size();j++){
+        workers[j].join();
+    }
 
 }
-int main(){
-    
-    
-    return 0;
-}
-
 
 
 

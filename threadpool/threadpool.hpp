@@ -4,25 +4,25 @@
 using namespace std;
 class threadpool {
     public:
-        threadpool(size_t numThreads);//threadpool create
+        threadpool(size_t num);//线程池创建
         ~threadpool(); // 释放
     
-        //template<typename F>
-        //auto enqueue(F&& f) -> future<typename result_of<F()>::type>; // 将任务添加到线程池的任务队列中
+        template<typename F> // 声明范型函数
+        auto enqueue(F&& f) -> future<invoke_result_t<F>>; // 创建任务队列
     
     private:
         vector<thread> workers; // 线程池中的线程
-        queue<function<void()>> taskqueue; // 任务队列
-        mutex mtx; // 互斥量
+        queue<function<void()>> tasks; // 任务队列
         condition_variable condition; // 条件变量
-        bool done; // 停止标志
+        mutex mtx; // 互斥量
+        bool stop; // 停止标志
     };
 
 #endif
 
 
-//quenen
-//ector
+//queue
+//vector
 //function
 
 
