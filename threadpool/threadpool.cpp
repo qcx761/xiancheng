@@ -7,9 +7,8 @@ threadpool::threadpool(size_t num):stop(false){
                 function<void()> task;
                 {
                 unique_lock<mutex> lock(this->mtx);
-                bool isempty=this->tasks.empty();
-                this->condition.wait(lock,!isempty||this->stop);
-                if(stop&&isempty) return;
+                this->condition.wait(lock,[this]{return !this->tasks.empty()||this->stop;});
+                if(stop&&this->tasks.empty()) return;
                 task=this->tasks.front();
                 this->tasks.pop();
                 }
@@ -31,43 +30,27 @@ threadpool::~threadpool(){
 }
 
 template<typename F,class... Args>
-auto enqueue(F&& f,Args&&... args) -> future<invoke_result_t<F,Args...>>{
+auto threadpool::enqueue(F&& f,Args&&... args) -> future<invoke_result_t<F,Args...>>{
     using return_type=invoke_result_t<F,Args...>;
      // 绑定函数和参数，创建packaged_task
-    auto task=make_shared<packaged_task<return_type()>>(bind(forward<F>(f),forward<Args>(args)...);
+    auto task=make_shared<packaged_task<return_type()>>(bind(forward<F>(f),forward<Args>(args)...));
     future<return_type> res=task->get_future();
-    
-    );
+    {
+        unique_lock<mutex> lock(this->mtx);
+
+        if(this->stop) {
+            throw std::runtime_error("enqueue on stopped ThreadPool");
+        }
+
+        // 将任务包装为void()类型
+        this->tasks.emplace([task]{(*task)();});
+    }
+    this->condition.notify_one();
+    return res;
 }
 
 
-// template<typename F>
-// auto ThreadPool::enqueue(F&& f) -> std::future<std::invoke_result_t<F>>
-// {
-//     using return_type = std::invoke_result_t<F>;
 
-//     // 1. 创建 packaged_task（已绑定可调用对象）
-//     auto task = std::make_shared<std::packaged_task<return_type()>>(
-//         std::forward<F>(f)
-//     );
-
-//     // 2. 获取 future
-//     std::future<return_type> res = task->get_future();
-
-//     // 3. 临界区（加锁入队）
-//     {
-//         std::unique_lock<std::mutex> lock(queue_mutex);
-//         if(stop) {
-//             throw std::runtime_error("enqueue on stopped ThreadPool");
-//         }
-//         tasks.emplace([task] { (*task)(); }); // 包装为 void() 类型
-//     }
-
-//     // 4. 唤醒一个工作线程
-//     condition.notify_one();
-
-//     return res;
-// }
 
 
 // public:
