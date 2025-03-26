@@ -39,18 +39,18 @@ class ThreadPool{
                 workers[j].join();
             }
         }
-    void Add_task(function<void(void*)> func,void* args){
-        {
-            unique_lock<mutex> lock(this->mtx);
-            tasks.emplace(Task(func,args));
+        void Add_task(function<void(void*)> func,void* args){
+            {
+                unique_lock<mutex> lock(this->mtx);
+                tasks.emplace(Task(func,args));
+            }
+            condition.notify_one(); // 通知一个线程
         }
-        condition.notify_one(); // 通知一个线程
-    }
     private:
-    vector<thread> workers; // 线程池中的线程
-    queue<Task> tasks; // 任务队列
-    condition_variable condition; // 条件变量
-    mutex mtx; // 互斥量
-    bool stop; // 停止标志
+        mutex mtx; // 互斥量
+        bool stop; // 停止标志
+        queue<Task> tasks; // 任务队列
+        vector<thread> workers; // 线程池中的线程
+        condition_variable condition; // 条件变量
 };
 
