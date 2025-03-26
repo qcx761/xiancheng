@@ -8,9 +8,9 @@ class Task{
         Task(std::function<void(void*)> func,void* args):function(func),arg(args){};
 };
 
-class threadpool{
+class Threadpool{
     public:
-        threadpool(int num):stop(false){
+        Threadpool(int num):stop(false){
             for(int i=0;i<num;i++){
                 this->workers.emplace_back([this]{
                     while(1){
@@ -29,18 +29,20 @@ class threadpool{
                 });
             }
         }
-        ~threadpool(){
-
-
-
-
-
-
+        ~Threadpool(){
+            {
+                unique_lock<mutex> lock(this->mtx);
+                this->stop=true;
+            }
+            this->condition.notify_all();
+            for(int j=0;j<this->workers.size();j++){
+                workers[j].join();
+            }
         }
     void Add_task(function<void(void*)> func,void* args){
         {
             unique_lock<mutex> lock(this->mtx);
-            tasks.emplace(Task(func,args))
+            tasks.emplace(Task(func,args));
         }
         condition.notify_one(); // 通知一个线程
     }
