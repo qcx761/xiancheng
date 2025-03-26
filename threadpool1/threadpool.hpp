@@ -8,9 +8,9 @@ class Task{
         Task(std::function<void(void*)> func,void* args):functions(func),arg(args){};
 };
 
-class Threadpool{
+class ThreadPool{
     public:
-        Threadpool(int num):stop(false){
+        ThreadPool(int num):stop(false){
             for(int i=0;i<num;i++){
                 this->workers.emplace_back([this]{
                     while(1){
@@ -29,7 +29,7 @@ class Threadpool{
                 });
             }
         }
-        ~Threadpool(){
+        ~ThreadPool(){
             {
                 unique_lock<mutex> lock(this->mtx);
                 this->stop=true;
