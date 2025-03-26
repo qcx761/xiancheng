@@ -3,9 +3,9 @@ using namespace std;
 
 class Task{
     public:
-        function<void(void*)> function;
+        function<void(void*)> functions;
         void *arg;
-        Task(std::function<void(void*)> func,void* args):function(func),arg(args){};
+        Task(std::function<void(void*)> func,void* args):functions(func),arg(args){};
 };
 
 class Threadpool{
@@ -22,8 +22,8 @@ class Threadpool{
                         task=std::move(this->tasks.front());
                         this->tasks.pop();
                         }
-                        if(task.function){
-                            task.function(task.arg);// 执行函数
+                        if(task.functions){
+                            task.functions(task.arg);// 执行函数
                         }
                     }
                 });
