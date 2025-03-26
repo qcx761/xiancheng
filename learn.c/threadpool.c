@@ -125,3 +125,14 @@ int main() {
     threadpool_destroy(); // 销毁线程池
     return 0;
 }
+
+
+
+
+
+// 使用 C++ 标准库线程:
+// std::vector<pthread_t> 被替换为 std::vector<std::thread>。
+// 创建线程时，使用 std::thread 的构造函数来替换 pthread_create。
+// 互斥锁和条件变量:
+// 原来的 pthread_mutex_t 和 sem_t 被替换为 std::mutex 和 std::condition_variable，这使得代码使用 C++ 的线程同步机制更加简洁。
+// 通过条件变量来等待任务的可用性，而不是使用信号量。
