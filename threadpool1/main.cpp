@@ -10,98 +10,93 @@
 
 using namespace std;
 
-// 合并两个已排序的部分
-void merge(vector<int>& arr, int left, int mid, int right) {
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
+// 定义参数结构体
+typedef struct {
+    int* array;
+    int low;
+    int high;
+} QuickSortArgs;
 
-    vector<int> L(n1);
-    vector<int> R(n2);
-
-    for (int i = 0; i < n1; i++)
-        L[i] = arr[left + i];
-    for (int j = 0; j < n2; j++)
-        R[j] = arr[mid + 1 + j];
-
-    int i = 0, j = 0, k = left;
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
-            arr[k] = L[i];
-            i++;
-        } else {
-            arr[k] = R[j];
-            j++;
-        }
-        k++;
-    }
-
-    while (i < n1) {
-        arr[k] = L[i];
-        i++;
-        k++;
-    }
-
-    while (j < n2) {
-        arr[k] = R[j];
-        j++;
-        k++;
-    }
+void swap(int& a, int& b) {
+    int temp = a;
+    a = b;
+    b = temp;
 }
 
-// 归并排序的普通函数
-void mergeSort(void* params) {
-    auto* args = static_cast<tuple<vector<int>*, int, int>*>(params);
-    vector<int>& arr = *get<0>(*args);
-    int left = get<1>(*args);
-    int right = get<2>(*args);
+// 函数
+int partition(int* array, int low, int high) {
+    int pivot = array[high]; // 选择最后一个元素作为基准
+    int left = low - 1; // 左指针
+    int right = high; // 右指针
 
-    if (left < right) {
-        int mid = left + (right - left) / 2;
+    while (1) {
+        // 移动左指针，直到找到一个大于基准的元素
+        while (array[++left]<pivot){
+            if(left>right){
+                left--;
+                break;
+            }
+        } 
+        // 移动右指针，直到找到一个小于基准的元素
+        while (array[--right] > pivot){
+            if(left>right){
+                right++;
+                break;
+            }
+        } 
+        
+        if (left ==right) {
+            break; // 左右指针相交，跳出循环
+        }
+        swap(array[left], array[right]); // 交换
+    }
+    swap(array[left], array[high]); // 将基准元素放到正确的位置
+    return left; // 返回基准的索引
+}
 
-        // 创建参数元组用于子任务
-        auto leftArgs = new tuple<vector<int>*, int, int>(&arr, left, mid);
-        auto rightArgs = new tuple<vector<int>*, int, int>(&arr, mid + 1, right);
+// 快速排序的实现
+void quickSort(void* args) {
+    QuickSortArgs* qsArgs = (QuickSortArgs*)args;
+    int low = qsArgs->low;
+    int high = qsArgs->high;
+    int* array = qsArgs->array;
 
-        // 使用线程池添加子任务
-        ThreadPool* pool = new ThreadPool(4); // 创建线程池
+    if (low < high) {
+        int pivotIndex = partition(array, low, high);
 
-        pool->Add_task([](void* arg) {
-            mergeSort(arg); // 调用 mergeSort
-        }, (void*)leftArgs);
+        // 创建新的参数结构体用于存储子问题的参数
+        QuickSortArgs leftArgs = { array, low, pivotIndex - 1 };
+        QuickSortArgs rightArgs = { array, pivotIndex + 1, high };
 
-        pool->Add_task([](void* arg) {
-            mergeSort(arg); // 调用 mergeSort
-        }, (void*)rightArgs);
+        // 设定线程池
+        ThreadPool pool(4);
 
-        // 合并已排序部分
-        // 注意这里不能在上面添加任务后直接合并
-        // 在所有子任务完成之后执行合并
-        // 这部分需要重新考虑如何同步。
-
-        // 可以使用同步机制，例如在 Add_task 类中添加等待机制
+        // 将左右子问题的排序任务添加到线程池
+        pool.Add_task(quickSort, (void*)&leftArgs);
+        pool.Add_task(quickSort, (void*)&rightArgs);
     }
 }
 
 int main() {
-    vector<int> arr = {38, 27, 43, 3, 9, 82, 10};
+    int arr[] = {38, 27, 43, 3, 9, 82, 10};
+    int n = sizeof(arr) / sizeof(arr[0]);
 
-    // 创建参数元组
-    tuple<vector<int>*, int, int> params(&arr, 0, arr.size() - 1);
+    QuickSortArgs args = { arr, 0, n - 1 };
 
     // 创建线程池
     ThreadPool pool(4);
 
-    // 调用归并排序
-    pool.Add_task(mergeSort, (void*)&params);
+    // 启动快速排序
+    pool.Add_task(quickSort, (void*)&args);
 
-    // 等待一些时间确保所有任务的执行
-    std::this_thread::sleep_for(std::chrono::seconds(1)); // 确保任务完成（需要更好的同步机制）
+    // 等待一定时间以确保所有任务完成
+    std::this_thread::sleep_for(std::chrono::seconds(2)); 
 
     // 打印结果
-    for (const auto& num : arr) {
-        cout << num << " ";
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
     }
-    cout << endl;
+    printf("\n");
 
-    return 0; // 结束程序
+    return 0;
 }
