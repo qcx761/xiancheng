@@ -56,28 +56,29 @@ int partition(int* array, int low, int high) {
 
 // 快速排序的实现
 void quickSort(void* args) {
-    QuickSortArgs* qsArgs = (QuickSortArgs*)args;
-    int low = qsArgs->low;
-    int high = qsArgs->high;
-    int* array = qsArgs->array;
+    QuickSortArgs* q = (QuickSortArgs*)args;
+    int low = q->low;
+    int high = q->high;
+    int* array = q->array;
 
-    if (low < high) {
-        int pivotIndex = partition(array, low, high);
+    if (low<high){
+        int middle = partition(array, low, high);
 
         // 创建新的参数结构体用于存储子问题的参数
-        QuickSortArgs leftArgs = { array, low, pivotIndex - 1 };
-        QuickSortArgs rightArgs = { array, pivotIndex + 1, high };
+        QuickSortArgs leftArgs = { array, low, middle - 1 };
+        QuickSortArgs rightArgs = { array, middle + 1, high };
 
-        // 设定线程池
-        ThreadPool pool(4);
+
 
         // 将左右子问题的排序任务添加到线程池
-        pool.Add_task(quickSort, (void*)&leftArgs);
-        pool.Add_task(quickSort, (void*)&rightArgs);
+        Add_task(quickSort, (void*)&leftArgs);
+        Add_task(quickSort, (void*)&rightArgs);
     }
 }
 
 int main() {
+    // 设定线程池    
+    ThreadPool(4);
     int arr[] = {38, 27, 43, 3, 9, 82, 10};
     int n = sizeof(arr) / sizeof(arr[0]);
 
