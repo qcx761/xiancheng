@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <random>
 #include "threadpool.hpp" // 确保这包含您的线程池实现
 
 using namespace std;
@@ -70,8 +71,17 @@ void quickSort(void* args) {
 }
 
 int main() {
-    int arr[] = {38, 27, 43, 3, 9, 82, 10, 23, 15, 90, 32};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    const int n = 10000; // 数组大小
+    int* arr = new int[n]; // 动态分配数组
+
+    // 用随机数填充数组
+    std::random_device rd; // 获取随机数种子
+    std::mt19937 gen(rd()); // 随机数生成器
+    std::uniform_int_distribution<> dis(1, 10000); // 设置随机数范围
+
+    for (int i = 0; i < n; i++) {
+        arr[i] = dis(gen); // 赋值随机数
+    }
 
     QuickSortArgs* args = new QuickSortArgs{arr, 0, n - 1};
 
@@ -87,5 +97,6 @@ int main() {
     }
     printf("\n");
 
+    delete[] arr; // 释放动态分配的数组
     return 0;
 }
