@@ -71,7 +71,7 @@ void quickSort(void* args) {
 }
 
 int main() {
-    const int n = 10000; // 数组大小
+    const int n = 100; // 数组大小
     int* arr = new int[n]; // 动态分配数组
 
     // 用随机数填充数组
