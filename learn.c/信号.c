@@ -53,3 +53,21 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+//     // 初始化信号集
+//     sigemptyset(&set);
+//     sigaddset(&set, SIGUSR1);   // 添加 SIGUSR1 到信号集
+
+//     // 设置信号掩码，阻塞 SIGUSR1
+//     if (pthread_sigmask(SIG_BLOCK, &set, &oldset) != 0) {
+//         perror("pthread_sigmask");
+//         return NULL;
+//     }
+
+// int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset); //线程信号掩码，单独处理信号集
+
+//sigandset等设置信号集
