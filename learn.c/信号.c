@@ -57,7 +57,7 @@ int main() {
 
 
 
-// sigset_t set
+// sigset_t set oldset;
 //     // 初始化信号集
 //     sigemptyset(&set);
 //     sigaddset(&set, SIGUSR1);   // 添加 SIGUSR1 到信号集
@@ -71,6 +71,6 @@ int main() {
 // SIG_UNBLOCK：从线程的信号掩码中移除信号集中的信号，即取消阻塞。
 // SIG_SETMASK：将线程的信号掩码替换为指定的信号集。
 
-// int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset); //线程信号掩码，单独处理信号集
+
 
 //sigandset等设置信号集
