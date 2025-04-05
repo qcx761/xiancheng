@@ -58,3 +58,37 @@ int main() {
     printf("Final counter value: %d\n", counter);
     return 0;
 }
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+#define MAX_CONCURRENT_THREADS 3
+sem_t semaphore;
+
+void* thread_func(void* arg) {
+    sem_wait(&semaphore); // 等待信号量
+    printf("Thread %ld is in the critical section.\n", (long)arg);
+    sleep(1); // 模拟工作
+    printf("Thread %ld is leaving the critical section.\n", (long)arg);
+    sem_post(&semaphore); // 释放信号量
+    return NULL;
+}
+
+int main() {
+    pthread_t threads[5];
+    sem_init(&semaphore, 0, MAX_CONCURRENT_THREADS); // 允许最多 3 个线程并发
+
+    for (long i = 0; i < 5; i++) {
+        pthread_create(&threads[i], NULL, thread_func, (void*)i);
+    }
+
+    for (int i = 0; i < 5; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    sem_destroy(&semaphore);
+    return 0;
+}
