@@ -1,6 +1,0 @@
-__GCC_CONSTRUCTIVE_SIZEca
-ascd
-defaultsda
-dasda
-__DBL_HAS_DENORM__中文
-啊
